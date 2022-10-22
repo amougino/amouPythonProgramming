@@ -1,0 +1,3 @@
+Black,White,Grey,Blue,Yellow,Red,Green,Purple,Orange,Cyan,Magenta,Indigo
+Black,White,Grey,Blue,Yellow,Red,Green,Purple,Orange,Cyan,Magenta,Indigo
+A,B,C,D,E,F,G,H
