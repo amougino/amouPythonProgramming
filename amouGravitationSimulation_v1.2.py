@@ -81,6 +81,7 @@ class SolarSystem:
             figsize=(self.size / 50, self.size / 50),
         )
         self.fig.tight_layout()
+        self.ax.set_facecolor((0.9, 0.9, 0.9))
         if not self.projection2d:
             self.ax.view_init(10, 5)
         else:
@@ -93,6 +94,7 @@ class SolarSystem:
         self.bodies.sort(key=lambda item: item.position[0])
         for body in self.bodies:
             body.move()
+            self.check_if_fusion()
             body.draw()
 
     def draw_all(self):
@@ -113,13 +115,38 @@ class SolarSystem:
         for idx, first in enumerate(bodies_copy):
             for second in bodies_copy[idx + 1:]:
                 first.accelerate_due_to_gravity(second)
+                
+    def check_if_fusion(self):
+        for body in self.bodies:
+            for otherBody in self.bodies:
+                if body != otherBody:
+                    distance = math.sqrt((body.position[0] - otherBody.position[0]) ** 2 + (body.position[1] - otherBody.position[1]) ** 2 + (body.position[2] - otherBody.position[2]) ** 2)
+                    distanceNeeded = (body.display_size + otherBody.display_size) / 2
+                    if distance < distanceNeeded:
+                        if body.mass > otherBody.mass:
+                            red = ((body.color[0] * body.mass) + (otherBody.color[0] * otherBody.mass)) / (body.mass + otherBody.mass)
+                            green = ((body.color[1] * body.mass) + (otherBody.color[1] * otherBody.mass)) / (body.mass + otherBody.mass)
+                            blue = ((body.color[2] * body.mass) + (otherBody.color[2] * otherBody.mass)) / (body.mass + otherBody.mass)
+                            body.color = (red, green, blue)
+                            body.mass += otherBody.mass
+                            otherBody.mass = 0.1
+                            x = ((body.position[0] * body.mass) + (otherBody.position[0] * otherBody.mass)) / (body.mass + otherBody.mass)
+                            y = ((body.position[1] * body.mass) + (otherBody.position[1] * otherBody.mass)) / (body.mass + otherBody.mass)
+                            z = ((body.position[2] * body.mass) + (otherBody.position[2] * otherBody.mass)) / (body.mass + otherBody.mass)
+                            body.position = (x, y, z)
+                            #xVel = (body.velocity.__getitem__(0) + otherBody.velocity.__getitem__(0)) / 2
+                            #yVel = (body.velocity.__getitem__(1) + otherBody.velocity.__getitem__(1)) / 2
+                            #zVel = (body.velocity.__getitem__(2) + otherBody.velocity.__getitem__(2)) / 2
+                            #body.velocity = Vector(xVel, yVel, zVel)
+                            body.velocity = Vector(0, 0, 0)
+
         
 class SolarSystemBody:
     
     min_display_size = 10
     display_log_base = 1.3
 
-    def __init__(self, solar_system, mass, position = (0, 0, 0), velocity = (0, 0, 0)):
+    def __init__(self, solar_system, mass, position = (0, 0, 0), velocity = (0, 0, 0), color = (0, 0, 0)):
         self.solar_system = solar_system
         self.mass = mass
         self.position = position
@@ -127,16 +154,29 @@ class SolarSystemBody:
         self.display_size = max(
             math.log(self.mass, self.display_log_base),
             self.min_display_size)
-        self.color = "black"
+        self.color = color
         self.solar_system.add_body(self)
+        self.points = [] ##
+        self.iter = 0 ##
 
     def move(self):
         self.position = (self.position[0] + self.velocity[0], self.position[1] + self.velocity[1], self.position[2] + self.velocity[2])
 
     def draw(self):
-        self.solar_system.ax.plot([list(self.position)[0]], [list(self.position)[1]], [list(self.position)[2]], marker = "o", markersize = self.display_size + self.position[0] / 30, color = self.color)
+        for i in self.points: ##
+            self.solar_system.ax.plot([i[0]], [i[1]], [i[2]], marker = "o", markersize = 1, color = (0, 0, 0)) ##
+        self.display_size = max(
+            math.log(self.mass, self.display_log_base),
+            self.min_display_size)
+        if self.mass != 0.1:
+            self.solar_system.ax.plot([list(self.position)[0]], [list(self.position)[1]], [list(self.position)[2]], marker = "o", markersize = self.display_size + self.position[0] / 30, color = self.color)
         if not self.solar_system.projection2d:
-            self.solar_system.ax.plot(self.position[0], self.position[1], - self.solar_system.size / 2, marker = "o", markersize = self.display_size / 2, color = (.5, .5, .5))
+            if self.mass != 0.1:
+                self.solar_system.ax.plot(self.position[0], self.position[1], - self.solar_system.size / 2, marker = "o", markersize = self.display_size / 2, color = (.5, .5, .5))
+        self.iter += 1 ##
+        if self.iter >= 10: ##
+            self.iter = 0 ##
+            self.points.append(self.position) ##
 
     def accelerate_due_to_gravity(self, other):
         distance = Vector(*other.position) - Vector(*self.position)
@@ -153,7 +193,7 @@ class SolarSystemBody:
 class Sun(SolarSystemBody):
     def __init__(self, solar_system, mass = 10000, position = (0, 0, 0), velocity = (0, 0, 0)):
         super(Sun, self).__init__(solar_system, mass, position, velocity)
-        self.color = "yellow"
+        self.color = (1, 1, 0)
 
 class Planet(SolarSystemBody):
     colors = itertools.cycle([(1, 0, 0), (0, 1, 0), (0, 0, 1)])
@@ -162,14 +202,21 @@ class Planet(SolarSystemBody):
         self.color = color #next(Planet.colors)
 
 solar_system = SolarSystem(size = 400, projection2d = False)
-suns = (
-    Sun(solar_system, position = (0, 0, 100), velocity = (2, 3, 4)),
-    Sun(solar_system, position = (0, 0, -100), velocity = (2, -3, -4))
-)
-planets = (
-    Planet(solar_system, 10, position = (100, 100, 0), velocity = (0, 5.5, 5.5), color = (.2, .2, .8)),
-    Planet(solar_system, 20, position = (0, 0, 0), velocity = (-11, 11, 0), color = (.6, .2, .2))
-)
+#suns = (
+#    Sun(solar_system, position = (0, 0, 100), velocity = (0, 5, 0)),
+#    Sun(solar_system, position = (0, 0, -100), velocity = (0, -5, 0))
+#)
+#planets = (
+#    Planet(solar_system, 600, position = (100, 100, 0), velocity = (0, 5.5, 5.5), color = (.2, .2, .8)),
+#    Planet(solar_system, 20, position = (0, 0, 0), velocity = (-11, 11, 0), color = (.6, .2, .2))
+#)
+
+#suns = (
+#    Sun(solar_system, position = (0, 0, 100), velocity = (0, 0, 0), mass = 10001),
+#    Sun(solar_system, position = (0, 0, -100), velocity = (0, 0, 0))
+#)
+
+bodies = (SolarSystemBody(solar_system, 500, position = (500, 0, 0), velocity = (0, 0, 0), color = (1, 0, 0)), SolarSystemBody(solar_system, 300, position = (-500, 0, 0), velocity = (0, 0, 0), color = (0, 0, 1)), SolarSystemBody(solar_system, 10000, position = (0, 0, 0), velocity = (0, 0, 0), color = (0, 0, 0)))
 
 while True:
     solar_system.calculate_all_body_interactions()
