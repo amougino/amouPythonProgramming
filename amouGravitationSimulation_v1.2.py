@@ -41,9 +41,9 @@ class Vector:
         
     def __mul__(self, other):
         
-        if isinstance(other, Vector):  # Vector dot product
+        if isinstance(other, Vector):
             return (self.x * other.x + self.y * other.y + self.z * other.z)
-        elif isinstance(other, (int, float)):  # Scalar multiplication
+        elif isinstance(other, (int, float)):
             return Vector(self.x * other, self.y * other, self.z * other)
         else:
             raise TypeError("operand must be Vector, int, or float")
