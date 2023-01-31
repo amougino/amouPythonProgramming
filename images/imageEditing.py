@@ -153,3 +153,12 @@ def percentageContrast(img, size, val, percentage):
 
 
 image = getImage('~/Desktop/Python/images/image2.png')
+imageSize, imageFormat = getImageInfo(image)
+
+
+#image = filter(image, imageSize, addFilter = [0, 0, 0], multFilter = [1.2, 1.2, 1.2])
+image = contrast(image, imageSize, 200, offset = 10)
+image = filter(image, imageSize, addFilter = [0, 0, 0], multFilter = [0.95, 0.9, 1.1])
+
+#display(image)
+saveImage(image, '~/Desktop/Python/images/test200constrast10offset95%_90%_110%multFilter.png')
