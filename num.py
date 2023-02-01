@@ -78,6 +78,20 @@ class num:
             while preDec < preDec2:
                 self.value.insert(0, 0)
                 preDec = self.findDecimal()
+
+        postDec = len(self.value) - preDec - 1
+        postDec2 = len(num.value) - preDec2 - 1
+        
+        if postDec < postDec2:
+            while postDec < postDec2:
+                self.value.append(0)
+                postDec = len(self.value) - preDec - 1
+
+        print(self.value)
+
+        #for i in range(preDec):
+        #    if preDec2 - i - 1 >= 0:
+        #        self.value[preDec - i - 1] += num.value[preDec2 - i - 1]
                 
     def printVal(self):
         print(self.value)
@@ -86,6 +100,5 @@ class num:
         
 a = num(2222)
 b = num(1.618033898)
-a.printVal()
-a.add(b)
+a.sub(b)
 a.printVal()
