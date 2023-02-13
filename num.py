@@ -42,7 +42,31 @@ class num:
                         self.value.insert(0, 1)
                     else:
                         self.value[obj - 1] += 1
-        
+    
+    def operation(self, op, num):
+        if op == 'add':
+            if self.sign == True:
+                if num.sign == True:
+                    self.add(num)
+                else:
+                    self.sub(num)
+            else:
+                if num.sign == True:
+                    self.sub(num)
+                else:
+                    self.add(num)
+        if op == 'sub':
+            if self.sign == True:
+                if num.sign == True:
+                    self.sub(num)
+                else:
+                    self.add(num)
+            else:
+                if num.sign == True:
+                    self.add(num)
+                else:
+                    self.sub(num)
+    
     def add(self, num):
         preDec = self.findDecimal()
         preDec2 = num.findDecimal()
@@ -87,18 +111,33 @@ class num:
                 self.value.append(0)
                 postDec = len(self.value) - preDec - 1
 
-        print(self.value)
+        for i in range(postDec):
+            if postDec - i <= postDec2:
+                if self.value[-i] >= num.value[-i]:
+                    self.value[-i] -= num.value[-i]
+                else:
+                    carryFound = False
+                    searchDigit = i + 1
+                    while carryFound == False:
+                        if searchDigit <= len(self.value) - 1:
+                            if self.value[-searchDigit] == '.':
+                                searchDigit += 1
+                            else:
+                                if self.value[-searchDigit] != 0:
+                                    pass #remove 1 for here, add base -1 to all until -i, add 10 to -i, do subtraction
+                                else:
+                                    searchDigit += 1
+                        else:
+                            pass #num - self.value and self.sign = opposite
 
-        #for i in range(preDec):
-        #    if preDec2 - i - 1 >= 0:
-        #        self.value[preDec - i - 1] += num.value[preDec2 - i - 1]
+                    
                 
     def printVal(self):
         print(self.value)
         
     
         
-a = num(2222)
-b = num(1.618033898)
-a.sub(b)
+a = num(0.0123456)
+b = num(0.0123456)
+a.operation('sub', b)
 a.printVal()
