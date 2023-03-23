@@ -1,8 +1,5 @@
-import numpy as np
 import math
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
-import itertools
 
 class Vector:
     
@@ -176,9 +173,11 @@ class SolarSystemBody:
 solar_system = SolarSystem(size = 400, projection2d = False)
 
 
-bodies = (SolarSystemBody(solar_system, 100, position = (0, 0, 0), velocity = (0, 0, 0), color = (1, 0, 0), radius = 696340, display_size = 1000))
+bodies = (SolarSystemBody(solar_system, 300, position = (150, 0, 0), velocity = (0, 0, 0), color = (1, 0, 0), radius = 696340, display_size = 400), SolarSystemBody(solar_system, 300, position = (-150, 0, 0), velocity = (0, 0, 0), color = (0, 0, 1), radius = 696340, display_size = 400))
 
 while True:
     solar_system.calculate_all_body_interactions()
     solar_system.update_all()
+    solar_system.check_if_fusion()
     solar_system.draw_all()
+    print("1 " + str(bodies[0].velocity) + " - 2 " + str(bodies[1].velocity))
