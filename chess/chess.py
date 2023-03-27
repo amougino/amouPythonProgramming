@@ -40,3 +40,4 @@ board = [
             [piece('rook', [7,0], 'white'), piece('knight', [7,1], 'white'), piece('bishop', [7,2], 'white'), piece('queen', [7,3], 'white'), piece('king', [7,4], 'white'), piece('bishop', [7,5], 'white'), piece('knight', [7,6], 'white'), piece('rook', [7,7], 'white')]
         ]
 print(board)
+print("\\")
