@@ -32,22 +32,6 @@ def createImg(size):
     return(img)
 
 #bits
-
-def numToBits(num):
-    bits = ''
-    for i in range(8):
-        if num >= 2**(7-i):
-            num -= 2**(7-i)
-            bits += '1'
-        else:
-            bits += '0'
-    return(bits) 
-
-def byteToNum(byte):
-    num = 0
-    for i in range(len(byte)):
-        num += int(byte[i]) * (2 ** (len(byte) - 1 - i))
-    return(num)
    
 def byteAdd(byte1, byte2):
     byte1List = splitString(byte1)
@@ -84,27 +68,28 @@ def bitsToImg(bits, size):
                 colorBits = bits[(x * size[1]) + y]
                 colors = []
                 for i in colorBits:
-                    colors.append(byteToNum(i))
+                    colors.append(int(i))
                 img.putpixel((x, y), (colors[0], colors[1], colors[2]))
             except IndexError:
                 img.putpixel((x, y), (0, 0, 0))
     return(img)
 
 def imgToBits(img):
-    foo = []
+    bits = []
     size = img.size
     for x in range(size[0]):
         for y in range(size[1]):
             pxl = img.getpixel((x,y))
-            foo.append([numToBits(pxl[0]), numToBits(pxl[1]), numToBits(pxl[2])])
-    return(foo)
+            for i in pxl:
+                bits.append(bin(i))
+    return(bits)
 
 
-print('step1')
-new = getImg(folderPath, 'image4.png')
-print('step2')
-byte = imgToBits(new)
-print('step3')
+#print('step1')
+#new = getImg(folderPath, 'image4.png')
+#print('step2')
+#byte = imgToBits(new)
+#print('step3')
 #saveImg(bitsToImg(byte, ((new.size[0] + 1), (new.size[1] + 1))), folderPath, 'image3.png')
 
 # 86 batches of 3 bytes (8 bits) -> first 256 bytes = plugboard, byte 257 = rotor 1, byte 258 = rotor 2
@@ -117,11 +102,10 @@ def stabilizeKey(key):
             byteKey.append(byte)
     stableKey = []
     while len(byteKey) != 0:
-        print(len(byteKey))
         plugboardKey = []
         rotors = []
-        for i in range(86):
-            if i < 84:
+        for i in range(258):
+            if i < 256:
                 if len(byteKey) != 0:
                     valid = False
                     while valid == False:
@@ -133,6 +117,7 @@ def stabilizeKey(key):
                     byteKey.pop(0)
                 else:
                     replacementByte = '00000000'
+                    valid = False
                     while valid == False:
                         if replacementByte in plugboardKey:
                            replacementByte = byteAdd(replacementByte, '00000001')
@@ -149,6 +134,7 @@ def stabilizeKey(key):
                
     return(stableKey)
 
-print(stabilizeKey(byte))
-
 #to do: change variable names (foo), remove all "pass"
+if bin('100') > bin('10'):
+    pass
+#value = int('0000111100001010', 2)
