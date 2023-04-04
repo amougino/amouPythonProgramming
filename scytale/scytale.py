@@ -1,10 +1,12 @@
+# coding=utf8
+
 from PIL import Image as Img
 import os
 import time #
 import random
 
-#folderPath = os.getcwd() # For mac
-folderPath = 'P:\Documents\py' # For windows, the path to the program's folder
+folderPath = os.getcwd() # For mac
+#folderPath = 'P:\Documents\py' # For windows, the path to the program's folder
 
 chars = [' ', '!', '“', '"', '#', '$', '%', '&', '‘', "'", '(', ')', '*', '+', ',', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '[', '\\', ']', '^', '_', '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '{', '|', '}', '~', '÷', '¡', '¢', '£', '€', '¤', '¥', '¦', '§', '¨', '©', 'ª', '«', '¬', '®', '¯', '°', '±', '²', '³', '´', 'µ', '¶', '·', '¸', '¹', 'º', '»', '¿', 'À', 'Á', ' ', 'Ã', 'Ä', 'Å', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', '×', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'Þ', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', '÷', 'Б', 'Г', 'Д', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'П', 'У', 'Ф', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'б', 'в', 'г', 'д', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'п', 'т', 'у', 'ф', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я', 'Δ', 'Θ', 'Λ', 'Ξ', 'Π', 'Σ', 'Φ', 'Ψ', 'Ω', 'α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'λ', 'μ', 'ν', 'ξ', 'π', 'ρ', 'ς', 'σ', 'φ', 'ψ', 'ω']
 
@@ -52,7 +54,7 @@ def imgToNums(img):
     for x in range(size[0]):
         for y in range(size[1]):
             pxl = img.getpixel((x,y))
-            for i in pxl:
+            for i in pxl:   
                 nums.append(i)
     return(nums)
     
@@ -108,19 +110,16 @@ def stabilizeKey(key):
 
 #to do: change variable names (foo), remove all "pass"
 
-#value = int('0000111100001010', 2)
-
-#print('step1')
-new = getImg(folderPath, 'image4.png')
-#print('step2')
+print('step1')
+new = getImg(folderPath, 'image.png')
+print('step2')
 nums = imgToNums(new)
-#print('step3')
-
-key = stabilizeKey(nums)
-
-saveImg(numsToImg(key, (1280, 781)), folderPath, 'image13.png')
-
-#saveImg(bitsToImg(byte, ((new.size[0] + 1), (new.size[1] + 1))), folderPath, 'image3.png')
+print('step3')
+saveImg(numsToImg(nums, new.size), folderPath, 'toto.png')
+#key = stabilizeKey(nums)
+#print(key)
+print('step4')
+#saveImg(numsToImg(key, new.size), folderPath, 'image14.png')
 
 # 86 batches of 3 bytes (8 bits) -> first 256 bytes = plugboard, byte 257 = rotor 1, byte 258 = rotor 2
 # plugboard -> rotor 1 -> mirror -> rotor 2 -> plugboard
