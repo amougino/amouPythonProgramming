@@ -108,6 +108,21 @@ def stabilizeKey(key):
     print('stabilizing total time ' + str(time.time() - timer1)) #
     return(key)
 
+def messageToNums(characters, message):
+    pass
+
+def rotor(character, rotorSetting):
+    pass
+
+def plugboard(character, plugboardSetting):
+    pass
+
+def mirror(character):
+    pass
+
+def scytale(message, settings):
+    pass
+
 #to do: change variable names (foo), remove all "pass"
 
 print('step1')
