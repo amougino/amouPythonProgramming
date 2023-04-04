@@ -54,8 +54,8 @@ def imgToNums(img):
     for x in range(size[0]):
         for y in range(size[1]):
             pxl = img.getpixel((x,y))
-            for i in pxl:   
-                nums.append(i)
+            for i in range(3):   
+                nums.append(pxl[i])
     return(nums)
     
 def generateRandomStableKey(length):
@@ -111,15 +111,13 @@ def stabilizeKey(key):
 #to do: change variable names (foo), remove all "pass"
 
 print('step1')
-new = getImg(folderPath, 'image.png')
+new = getImg(folderPath, 'cassini.png')
 print('step2')
 nums = imgToNums(new)
 print('step3')
-saveImg(numsToImg(nums, new.size), folderPath, 'toto.png')
-#key = stabilizeKey(nums)
-#print(key)
+key = stabilizeKey(nums)
 print('step4')
-#saveImg(numsToImg(key, new.size), folderPath, 'image14.png')
+saveImg(numsToImg(key, new.size), folderPath, 'image17.png')
 
 # 86 batches of 3 bytes (8 bits) -> first 256 bytes = plugboard, byte 257 = rotor 1, byte 258 = rotor 2
 # plugboard -> rotor 1 -> mirror -> rotor 2 -> plugboard
