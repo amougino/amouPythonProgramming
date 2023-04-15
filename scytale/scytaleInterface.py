@@ -36,37 +36,32 @@ def textInput(window, textInputBorder, textInputX, textInputY, textInputWidth, t
     txtfld.place(x = textInputX, y = textInputY)
     return(txtfld)
 
-def getContents():
-    print('encode or decode : ' + str(encodeOrDecode.get()))
+def getContents(event):
     print('image file : ' + imageSelector.get())
     print('message : ' + messageTextInputContents.get())
-    if encodeOrDecode.get() == 1:
-        operationType = 'encode'
-    else:
-        operationType = 'decode'
     if imageSelector.get() != '':
         image = scy.getImg(folderPath, imageSelector.get())
         messageValid = scy.checkIfMessageValid(chars, messageTextInputContents.get())
         if messageValid == True:
             if image != False:
-                resultTextInput = textInput(win, 3, 40, 330, 150, textInputState = 'readonly')
+                resultTextInput = textInput(win, 3, 40, 250, 150, textInputState = 'readonly')
                 resultTextInputContents = StringVar()
-                resultTextInputContents.set(scy.scytale(operationType, chars, messageTextInputContents.get(), scy.imgToNums(image)))
+                resultTextInputContents.set(scy.scytale(chars, messageTextInputContents.get(), scy.imgToNums(image)))
                 resultTextInput['textvariable'] = resultTextInputContents
             else:
-                resultTextInput = textInput(win, 3, 40, 330, 150, textInputState = 'readonly')
+                resultTextInput = textInput(win, 3, 40, 250, 150, textInputState = 'readonly')
                 resultTextInputContents = StringVar()
-                resultTextInputContents.set('! Image not valid')
+                resultTextInputContents.set('ERROR ! Image not valid')
                 resultTextInput['textvariable'] = resultTextInputContents
         else:
-            resultTextInput = textInput(win, 3, 40, 330, 150, textInputState = 'readonly')
+            resultTextInput = textInput(win, 3, 40, 250, 150, textInputState = 'readonly')
             resultTextInputContents = StringVar()
-            resultTextInputContents.set('! Message not valid')
+            resultTextInputContents.set('ERROR ! Message not valid')
             resultTextInput['textvariable'] = resultTextInputContents
     else:
-        resultTextInput = textInput(win, 3, 40, 330, 150, textInputState = 'readonly')
+        resultTextInput = textInput(win, 3, 40, 250, 150, textInputState = 'readonly')
         resultTextInputContents = StringVar()
-        resultTextInputContents.set('! Enter a image')
+        resultTextInputContents.set('ERROR ! Enter a image')
         resultTextInput['textvariable'] = resultTextInputContents
 
 def exit(event):
@@ -75,23 +70,9 @@ def exit(event):
 win = Tk()
 
 win.title('scytale')
-win.geometry("1600x450+150+100")
+win.geometry("1600x375+150+100")
 
-operationLabel = label(win, 'Operation (encode or decode) :', 'black', ('Times', 20), 40, 40)
-
-encodeOrDecode = IntVar()
-encodeOrDecode.set(1)
-encodeButton = Radiobutton(win, text = "Encode", variable = encodeOrDecode, value = 1, font = ('Times', 16))
-decodeButton = Radiobutton(win, text = "Decode", variable = encodeOrDecode, value = 2, font = ('Times', 16))
-encodeButton.place(x = 50, y = 80)
-decodeButton.place(x = 140, y = 80)
-
-imageFileLabel = label(win, 'Image file used for settings :', 'black', ('Times', 20), 40, 120)
-
-#imageFileTextInput = textInput(win, 3, 50, 160, 40)
-#imageFileTextInputContents = StringVar()
-#imageFileTextInputContents.set('')
-#imageFileTextInput['textvariable'] = imageFileTextInputContents
+imageFileLabel = label(win, 'Image file used for settings :', 'black', ('Times', 20), 40, 40)
 
 filesInFolder = [f for f in os.listdir(folderPath + '/scytale') if os.path.isfile(os.path.join(folderPath + '/scytale', f))]
 imagesInFolder = []
@@ -104,19 +85,20 @@ for i in range(len(imagesInFolder)):
     fileVariables.append(IntVar())
 
 imageSelector = Combobox(win, values = imagesInFolder, state = 'readonly')
-imageSelector.place(x = 50, y = 160)
+imageSelector.place(x = 45, y = 80)
 
-messageLabel = label(win, 'Message to encode / decode :', 'black', ('Times', 20), 40, 200)
+messageLabel = label(win, 'Message to encode / decode :', 'black', ('Times', 20), 40, 120)
 
-messageTextInput = textInput(win, 3, 40, 240, 150)
+messageTextInput = textInput(win, 3, 45, 160, 150)
 messageTextInputContents = StringVar()
 messageTextInputContents.set('')
 messageTextInput['textvariable'] = messageTextInputContents
 
 enterButton = Button(win, text = ' Enter ', command = getContents, font = ('Times', 24))
-enterButton.place(x = 75, y = 290)
+enterButton.place(x = 45, y = 210)
+win.bind('<Return>', getContents)
 
-messageLabel = label(win, 'Press ESC to quit', 'black', ('Times', 14), 30, 400)
+messageLabel = label(win, 'Press ESC to quit', 'black', ('Times', 14), 40, 300)
 
 win.bind('<Escape>', exit)
 

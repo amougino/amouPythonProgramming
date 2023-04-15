@@ -68,39 +68,29 @@ def numsToMessage(charactersList, message):
         message[idx] = charactersList[i]
     return(message)
 
-def rotor(character, rotorSetting, type):
-    if type == 'encode':
-        character += rotorSetting
-    else:
-        character += 256 - rotorSetting
+def rotor(character, rotorSetting):
+    character += rotorSetting
     character %= 256
     return(character)
 
-def plugboard(character, plugboardSetting, type):
-    if type == 'encode':
-        return(plugboardSetting[character])
-    else:
-        return(plugboardSetting.index(character))
+def plugboard(character, plugboardSetting):
+    return(plugboardSetting[character])
 
 def mirror(character):
     return(255 - character)
 
-def scytale(operation, characters, message, imageNumbers):
+def scytale(characters, message, imageNumbers):
     messageList = [char for char in message]
     messageNums = messageToNums(characters, messageList)
     possibleSetsInImgNums = len(imageNumbers) % 258
-    if operation == 'encode':
-        rotorChange = 0.5
-    else:
-        rotorChange = -0.5
     for idx in range(len(messageNums)):
         setNumber = idx % possibleSetsInImgNums
         stableKey = stabilizeKey(imageNumbers[(setNumber * 258):((setNumber * 258) + 258)])
-        messageNums[idx] = plugboard(messageNums[idx], stableKey[0], operation)
-        messageNums[idx] = rotor(messageNums[idx], stableKey[1][int(0.5 - rotorChange)], operation)
+        messageNums[idx] = plugboard(messageNums[idx], stableKey[0])
+        messageNums[idx] = rotor(messageNums[idx], stableKey[1][0])
         messageNums[idx] = mirror(messageNums[idx])
-        messageNums[idx] = rotor(messageNums[idx], stableKey[1][int(0.5 + rotorChange)], operation)
-        messageNums[idx] = plugboard(messageNums[idx], stableKey[0], operation)
+        messageNums[idx] = rotor(messageNums[idx], stableKey[1][1])
+        messageNums[idx] = plugboard(messageNums[idx], stableKey[0])
     return(''.join(numsToMessage(characters, messageNums)))
 
 # 86 batches of 3 bytes (8 bits) -> first 256 bytes = plugboard, byte 257 = rotor 1, byte 258 = rotor 2
