@@ -64,6 +64,9 @@ def getContents(event):
         resultTextInputContents.set('ERROR ! Enter a image')
         resultTextInput['textvariable'] = resultTextInputContents
 
+def getContentsButton():
+    getContents('test')
+
 def exit(event):
     win.destroy()
 
@@ -94,7 +97,7 @@ messageTextInputContents = StringVar()
 messageTextInputContents.set('')
 messageTextInput['textvariable'] = messageTextInputContents
 
-enterButton = Button(win, text = ' Enter ', command = getContents, font = ('Times', 24))
+enterButton = Button(win, text = ' Enter ', command = getContentsButton, font = ('Times', 24))
 enterButton.place(x = 45, y = 210)
 win.bind('<Return>', getContents)
 

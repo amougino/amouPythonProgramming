@@ -19,10 +19,5 @@ b = np.where(a > 30, np.nan, b)
 ax[1,1].imshow(b,vmin=0,vmax=np.max(a))
 
 plt.show()
-#for i in range(10):
-#        a[i,:]=i
-#        plt.imshow(a,cmap='Blues')
-#plt.plot(np.arange(10),np.arange(10))
-#        plt.show()
 
 print('toto')
