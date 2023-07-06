@@ -19,7 +19,7 @@ def pi(precision):
     return(4*answer)
 
 start = time.time()
-pi_n = pi(4000000000)
+pi_n = pi(40000000)
 print( "{:.100f}".format(pi_n))
 end = time.time()
 print(end - start)
@@ -41,7 +41,7 @@ def pi2(precision):
     return np.float64(4.0) * np.sum((sign*np.float64(1.0)/factor))
 
 start = time.time()
-pi_n2 = pi2(4000000000)
+pi_n2 = pi2(40000000)
 print( "{:.100f}".format(pi_n2))
 end = time.time()
 print(end - start)
