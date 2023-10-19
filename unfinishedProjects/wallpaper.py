@@ -1,7 +1,7 @@
 from PIL import Image as Img
 import os
 
-imgPath = os.getcwd() + '/enceladus.jpeg'
+imgPath = os.path.expanduser("~/Desktop")
 newX = 10000
 newY = 6000
 
