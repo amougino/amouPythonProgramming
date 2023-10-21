@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 from tkinter.ttk import Combobox
+import matplotlib.pyplot as plt
 import datetime
 
 # SETTINGS
@@ -80,6 +81,30 @@ def saveData(strData, filePath):
     file.write(strData)
     file.close()
 
+def organize(data):
+    newData = []
+    for i in range(len(data[0])):
+        newLine = []
+        for j in data:
+            if i > 0:
+                newLine.append(float(j[i]))
+            else:
+                newLine.append(j[i])
+        newData.append(newLine)
+    return(newData)
+
+def dateToTime(timeValues):
+    startTime = datetime.timedelta(hours = int(timeValues[0][:2]), minutes = int(timeValues[0][3:5]), seconds = int(timeValues[0][6:8]), milliseconds = int(timeValues[0][9:]))
+    newTime = []
+    newTime.append(0)
+    timeValues = list(timeValues)
+    timeValues.pop(0)
+    for i in range(len(timeValues)):
+        timeAsDate = datetime.timedelta(hours = int(timeValues[i][:2]), minutes = int(timeValues[i][3:5]), seconds = int(timeValues[i][6:8]), milliseconds = int(timeValues[i][9:]))
+        deltaT = timeAsDate - startTime
+        newTime.append(int(1000*(deltaT.seconds + (deltaT.microseconds/1000000)))/1000)
+    return(newTime)
+
 def label(window, labelText, labelColor, labelFont, labelX, labelY):
     lbl = tk.Label(window, text = labelText, fg = labelColor, font = labelFont)
     lbl.place(x = labelX, y = labelY)
@@ -107,27 +132,60 @@ fileSelector.place(x = 22*guiScale, y = 28*guiScale)
 
 readableVar = tk.IntVar()
 readableButton = tk.Checkbutton(interface, text = 'Turn into readable', font = ('Times', int(12.5*guiScale)), variable = readableVar)
-readableButton.place(x = 22*guiScale, y = 50*guiScale)
+readableButton.place(x = 22*guiScale, y = 55*guiScale)
+
+gyroVar = tk.IntVar()
+gyroButton = tk.Checkbutton(interface, text = 'Show rotation speed evolution', font = ('Times', int(12.5*guiScale)), variable = gyroVar)
+gyroButton.place(x = 22*guiScale, y = 75*guiScale)
+
+rotVar = tk.IntVar()
+rotButton = tk.Checkbutton(interface, text = 'Show number of rotations evolution', font = ('Times', int(12.5*guiScale)), variable = rotVar)
+rotButton.place(x = 22*guiScale, y = 95*guiScale)
+
+accVar = tk.IntVar()
+accButton = tk.Checkbutton(interface, text = 'Show acceleration evolution', font = ('Times', int(12.5*guiScale)), variable = accVar)
+accButton.place(x = 22*guiScale, y = 115*guiScale)
+
+speedVar = tk.IntVar()
+speedButton = tk.Checkbutton(interface, text = 'Show speed evolution', font = ('Times', int(12.5*guiScale)), variable = speedVar)
+speedButton.place(x = 22*guiScale, y = 135*guiScale)
+
+distVar = tk.IntVar()
+distButton = tk.Checkbutton(interface, text = 'Show distance evolution', font = ('Times', int(12.5*guiScale)), variable = distVar)
+distButton.place(x = 22*guiScale, y = 155*guiScale)
 
 enterExplanation = label(interface, 'Press Enter to confirm and Esc to exit', 'black', ('Times', int(15*guiScale)), 550*guiScale, 460*guiScale)
 
 def getContents(event):
     selectedFile = fileSelector.get()
-    if selectedFile.split('.')[1] == 'txt':
-        fileData = getData(folderPath + selectedFile)
-        if readableVar.get() == 1:
+    split = selectedFile.split('.')
+    if len(split) > 1:
+        if selectedFile.split('.')[-1] == 'txt':
+            fileData = getData(folderPath + selectedFile)
             useful = keepUseful(fileData, ['Time', 'AccX(g)', 'AccY(g)', 'AccZ(g)', 'GyroX(°/s)', 'GyroY(°/s)', 'GyroZ(°/s)', 'AngleX(°)', 'AngleY(°)', 'AngleZ(°)'])
-            print(useful)
-            print('1------')
-            useful.pop(0)
-            beautiful = beautify(useful)
-            print(beautiful)
-            print('2------')
-            dataStr = dataToStr(beautiful, 'Time         AccX(g)   AccY(g)   AccZ(g)   GyX(°/s)  GyY(°/s)  GyZ(°/s)  AngX(°)   AngY(°)   AngZ(°)')
-            print(dataStr)
-            print('3------')
-            saveData(dataStr, folderPath + 'test1.txt')
-            print(' i did stuff i think')
+            usefulNoTitle = useful.copy()
+            usefulNoTitle.pop(0)
+            organized = organize(usefulNoTitle)
+            graphToShow = False
+            timeValues = dateToTime(organized[0])
+            if readableVar.get() == 1:
+                beautiful = beautify(usefulNoTitle)
+                dataStr = dataToStr(beautiful, 'Time         AccX(g)   AccY(g)   AccZ(g)   GyX(°/s)  GyY(°/s)  GyZ(°/s)  AngX(°)   AngY(°)   AngZ(°)')
+                saveData(dataStr, folderPath + 'beautify_' + split[0]+ '.txt')
+            elif gyroVar.get() == 1:
+                graphToShow = True
+                gyroXIdx = useful[0].index('GyroX(°/s)')
+                gyroYIdx = useful[0].index('GyroY(°/s)')
+                gyroZIdx = useful[0].index('GyroZ(°/s)')
+                plt.figure(1)
+                plt.suptitle('Evolution of rotation speed\n x = red, y = blue, z = green')
+                plt.xlabel('Time')
+                plt.ylabel('Degrees/s')
+                colors = ['r', 'b', 'g']
+                for idx, x in enumerate([gyroXIdx, gyroYIdx, gyroZIdx]):
+                    plt.plot(timeValues, organized[x], colors[idx])
+            if graphToShow == True:
+                plt.show()
         
 
 interface.bind('<Return>', getContents)
@@ -139,7 +197,7 @@ interface.bind('<Escape>', exit)
 
 interface.mainloop()
 
-print(datetime.timedelta(hours = 13, minutes = 24, seconds = 26, milliseconds = 435) - datetime.timedelta(hours = 13, minutes = 24, seconds = 21, milliseconds = 274))
+#print(datetime.timedelta(hours = 13, minutes = 24, seconds = 26, milliseconds = 435) - datetime.timedelta(hours = 13, minutes = 24, seconds = 21, milliseconds = 274))
 
 '''
 To do
