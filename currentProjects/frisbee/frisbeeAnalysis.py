@@ -388,7 +388,6 @@ def getContents(event):
                 speedTimeValues = copy.copy(timeValues)
                 speedTimeValues.pop(-1)
                 if speedVar.get() == 1:
-                    #print('speed')
                     plt.figure(4)
                     plt.suptitle('Evolution of Speed\n x = red, y = green, z = blue')
                     plt.xlabel('Time')
@@ -396,9 +395,7 @@ def getContents(event):
                     colors = ['r', 'g', 'b']
                     for i in range(3):
                         plt.plot(speedTimeValues, speed[i], color = colors[i])
-                    #print(len(speedTimeValues), len(speed[0]))
                 if distVar.get() == 1:
-                    #print('distance')
                     distance = [[],[],[]]
                     for xyz in range(3):
                         distVal = 0
@@ -412,8 +409,6 @@ def getContents(event):
                     colors = ['r', 'g', 'b']
                     distanceTimeValues = copy.copy(speedTimeValues)
                     distanceTimeValues.pop(-1)
-                    #print(len(distanceTimeValues))
-                    #print(len(distance[0]))
                     for i in range(3):
                         plt.plot(distanceTimeValues, distance[i], color = colors[i])
 
