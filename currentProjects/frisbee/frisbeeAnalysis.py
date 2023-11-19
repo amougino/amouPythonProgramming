@@ -1,18 +1,27 @@
+# -*- coding: utf-8 -*-
+
+from math import pi, sqrt
 import os
 import tkinter as tk
 from tkinter.ttk import Combobox
+import matplotlib
 import matplotlib.pyplot as plt
 import datetime
+import copy
+#import more_itertools
 
 # SETTINGS
 
 #location of the file
-folderPath = os.getcwd() + '/currentProjects/frisbee/' #for mac
+folderPath = os.getcwd() + '/Data/' #for ben
+#folderPath = os.getcwd() + '/frisbee/' #for mac
 #folderPath = 'P:/Documents/python/frisbee/' #for windows
 
 #size
 #if guiScale = 1 then window size is 800x500
-guiScale = 1.6
+guiScale = 1.3
+
+matplotlib.use('TkAgg')
 
 def getData(filePath):
     file = open(filePath, 'r')
@@ -102,7 +111,7 @@ def dateToTime(timeValues):
     for i in range(len(timeValues)):
         timeAsDate = datetime.timedelta(hours = int(timeValues[i][:2]), minutes = int(timeValues[i][3:5]), seconds = int(timeValues[i][6:8]), milliseconds = int(timeValues[i][9:]))
         deltaT = timeAsDate - startTime
-        newTime.append(int(1000*(deltaT.seconds + (deltaT.microseconds/1000000)))/1000)
+        newTime.append(deltaT.seconds + (float(deltaT.microseconds)/10**6))
     return(newTime)
 
 def label(window, labelText, labelColor, labelFont, labelX, labelY):
@@ -120,7 +129,7 @@ def text(window, textInputBorder, textInputX, textInputY, textInputWidth, textIn
 
 interface = tk.Tk()
 interface.title('frisbeeAnalysisInterface')
-interface.geometry(f'{int(800*guiScale)}x{int(500*guiScale)}+{int(50*guiScale)}+{int(50*guiScale)}')
+interface.geometry(str(int(800*guiScale)) + 'x' + str(int(500*guiScale)) + '+' + str(int(50*guiScale)) + '+' + str(int(50*guiScale)))
 interface.configure(bg = '#eeeeee')
 
 selectFile = label(interface, 'Select file to analyse :', 'black', ('Times', int(12.5*guiScale)), 22*guiScale, 6*guiScale)
@@ -154,39 +163,281 @@ distVar = tk.IntVar()
 distButton = tk.Checkbutton(interface, text = 'Show distance evolution', font = ('Times', int(12.5*guiScale)), variable = distVar)
 distButton.place(x = 22*guiScale, y = 155*guiScale)
 
+manualTimeLabel = label(interface, 'Enter manual time in ms (empty if not manual)', 'black', ('Times', int(12.5*guiScale)), 22*guiScale, 175*guiScale)
+
+manualTimeVar = tk.StringVar()
+manualTimeEntry = tk.Entry(interface, textvariable = manualTimeVar)
+manualTimeEntry.place(x = 350*guiScale, y = 175*guiScale)
+
+magVar = tk.IntVar()
+magButton = tk.Checkbutton(interface, text = 'Show magnetic evolution (not ready)', font = ('Times', int(12.5*guiScale)), variable = magVar)
+magButton.place(x = 22*guiScale, y = 195*guiScale)
+
 enterExplanation = label(interface, 'Press Enter to confirm and Esc to exit', 'black', ('Times', int(15*guiScale)), 550*guiScale, 460*guiScale)
 
+def waspos(n):
+    poscount = 0
+    for i in n:
+        if i>0:
+            poscount +=1
+    if poscount>=(len(n)-1):
+        return True
+    else:
+        return False
+
+def wasneg(n):
+    negcount = 0
+    for i in n:
+        if i<0:
+            negcount +=1
+    if negcount>=(len(n)-1):
+        return True
+    else:
+        return False
+
 def getContents(event):
+    g = 9.81
     selectedFile = fileSelector.get()
     split = selectedFile.split('.')
     if len(split) > 1:
         if selectedFile.split('.')[-1] == 'txt':
             fileData = getData(folderPath + selectedFile)
-            useful = keepUseful(fileData, ['Time', 'AccX(g)', 'AccY(g)', 'AccZ(g)', 'GyroX(°/s)', 'GyroY(°/s)', 'GyroZ(°/s)', 'AngleX(°)', 'AngleY(°)', 'AngleZ(°)'])
-            usefulNoTitle = useful.copy()
+            #ca ne marche pas pour lordi de lecole
+            useful = keepUseful(fileData, ['Time', 'AccX(g)', 'AccY(g)', 'AccZ(g)', 'GyroX(°/s)', 'GyroY(°/s)', 'GyroZ(°/s)', 'AngleX(°)', 'AngleY(°)', 'AngleZ(°)', 'MagX(μt)', 'MagY(μt)', 'MagZ(μt)'])
+            #ca marche pour lordi de lecole
+            #useful = keepUseful(fileData, ['Time', 'AccX(g)', 'AccY(g)', 'AccZ(g)', 'GyroX(Â°/s)', 'GyroY(Â°/s)', 'GyroZ(Â°/s)', 'AngleX(Â°)', 'AngleY(Â°)', 'AngleZ(Â°)', 'MagX(Î¼t)', 'MagY(Î¼t)', 'MagZ(Î¼t)'])
+            #print(fileData)
+            #print(useful)
+            usefulNoTitle = copy.copy(useful)
             usefulNoTitle.pop(0)
             organized = organize(usefulNoTitle)
             graphToShow = False
-            timeValues = dateToTime(organized[0])
+            try:
+                manualTime = float(manualTimeVar.get())
+                timeValues = [(manualTime*i)/1000 for i in range(len(organized[0]))]
+            except ValueError:
+                timeValues = dateToTime(organized[0])
+            #print(timeValues)
             if readableVar.get() == 1:
                 beautiful = beautify(usefulNoTitle)
-                dataStr = dataToStr(beautiful, 'Time         AccX(g)   AccY(g)   AccZ(g)   GyX(°/s)  GyY(°/s)  GyZ(°/s)  AngX(°)   AngY(°)   AngZ(°)')
+                dataStr = dataToStr(beautiful, 'Time         AccX(g)   AccY(g)   AccZ(g)   GyroX(°/s)  GyroY(°/s)  GyZ(°/s)  AngX(°)   AngY(°)   AngZ(°)')
                 saveData(dataStr, folderPath + 'beautify_' + split[0]+ '.txt')
-            elif gyroVar.get() == 1:
+
+            #----------------------------------------------------
+            #Definie les indexe des donnees
+            #----------------------------------------------------
+            #ca ne marche pas sur lordi de lecole
+            
+            gyroXIdx = useful[0].index('GyroX(°/s)')
+            gyroYIdx = useful[0].index('GyroY(°/s)')
+            gyroZIdx = useful[0].index('GyroZ(°/s)')
+            AccXIdx = useful[0].index('AccX(g)')
+            AccYIdx = useful[0].index('AccY(g)')
+            AccZIdx = useful[0].index('AccZ(g)')
+            AngXIdx = useful[0].index('AngleX(°)')
+            AngYIdx = useful[0].index('AngleY(°)')
+            AngZIdx = useful[0].index('AngleZ(°)')
+            MagXIdx = useful[0].index('MagX(μt)')
+            MagYIdx = useful[0].index('MagY(μt)')
+            MagZIdx = useful[0].index('MagZ(μt)')
+
+            '''
+            #ca marche sur lordi de lecole
+            gyroXIdx = useful[0].index('GyroX(Â°/s)')
+            gyroYIdx = useful[0].index('GyroY(Â°/s)')
+            gyroZIdx = useful[0].index('GyroZ(Â°/s)')
+            AccXIdx = useful[0].index('AccX(g)')
+            AccYIdx = useful[0].index('AccY(g)')
+            AccZIdx = useful[0].index('AccZ(g)')
+            AngXIdx = useful[0].index('AngleX(Â°)')
+            AngYIdx = useful[0].index('AngleY(Â°)')
+            AngZIdx = useful[0].index('AngleZ(Â°)')
+            MagXIdx = useful[0].index('MagX(Î¼t)')
+            MagYIdx = useful[0].index('MagY(Î¼t)')
+            MagZIdx = useful[0].index('MagZ(Î¼t)')
+            '''
+
+            gyro = [[],[],[]]
+            if rotVar.get() + gyroVar.get() > 0:
+                for idx, i in enumerate([gyroXIdx, gyroYIdx, gyroZIdx]):
+                    for j in organized[i]:
+                        gyro[idx].append((j*pi)/180)
+
+            
+            
+            acc = [[],[],[]]
+            if accVar.get() + speedVar.get() + distVar.get() + rotVar.get() + gyroVar.get() > 0:
+                for idx, i in enumerate([AccXIdx, AccYIdx, AccZIdx]):
+                    for j in organized[i]:
+                        if idx == 2:
+                            acc[idx].append((j + 1) * g)
+                        else:
+                            acc[idx].append(j * g)
+
+
+            #----------------------------------------------------
+            #Donne la vitesse angulaire en fonction du temps
+            #----------------------------------------------------
+            RAYON = 0.00722453563
+            if gyroVar.get() == 1:
                 graphToShow = True
-                gyroXIdx = useful[0].index('GyroX(°/s)')
-                gyroYIdx = useful[0].index('GyroY(°/s)')
-                gyroZIdx = useful[0].index('GyroZ(°/s)')
                 plt.figure(1)
-                plt.suptitle('Evolution of rotation speed\n x = red, y = blue, z = green')
+                plt.suptitle('Evolution of rotation speed\n x = red, y = green, z = blue')
                 plt.xlabel('Time')
-                plt.ylabel('Degrees/s')
+                plt.ylabel('Rad/s')
+                colors = ['r', 'g', 'b']
+                for idx, x in enumerate([gyroXIdx, gyroYIdx, gyroZIdx]):
+                    newgyro = []
+                    if x == gyroXIdx:
+                        xa = 0
+                        xb = 0
+                    elif x== gyroYIdx:
+                        xa = 1
+                        xb = 1
+                    elif x == gyroZIdx:
+                        xa = 2
+                        xb = 2
+
+                    tpr = []
+                    tpr_time = []
+                    for i in range (len(gyro[xa])):
+                        sped  = acc[xb][i]
+                        print(sped)
+                        if sped<0:
+                            speed = -sqrt(abs(sped/RAYON))
+                        else:
+                            speed = sqrt(abs(sped/RAYON))
+                        
+                        if speed < 100:
+                            tpr_time.append(timeValues[i])
+                            tpr.append(speed)
+
+
+                    for i in range (len(gyro[xa])):
+                        if abs(gyro[xa][i]) < 30: #1700 degree sec
+                            newgyro.append(gyro[xa][i])
+                        else:
+                            try:
+                                index = list(j>=timeValues[i] for j in tpr_time).index(True)
+                                #print('index=',index)
+                            except:
+                                index = None
+
+
+                            if index != None:
+                                if organized[x][i]<0:
+                                    newgyro.append(-tpr[index])
+                                else:
+                                    newgyro.append(tpr[index])
+                            else:
+                                newgyro.append(gyro[xa][i])
+
+                    if newgyro != gyro[xa]:
+                        plt.plot(timeValues, gyro[xa], color= 'aquamarine')
+                    #print (timeValues,len(timeValues), "\n", newgyro, len(newgyro))
+                    plt.plot(timeValues, newgyro, color = colors[idx])
+
+            #----------------------------------------------------
+            #Donne l'acceration en fonction du temps
+            #----------------------------------------------------
+            if accVar.get() == 1:
+                print('acc')
+                graphToShow = True
+                plt.figure(2)
+                plt.suptitle('Evolution of acceration\n x = red, y = green, z = blue')
+                plt.xlabel('Time')
+                plt.ylabel('m/s^2')
+                colors = ['r', 'g', 'b']
+                for i in range(len(acc)):
+                    acceleration = []
+                    for j in range(len(acc[i])):
+                        acceleration.append(acc[i][j])
+                    plt.plot(timeValues, acceleration, color = colors[i])
+
+
+            #----------------------------------------------------
+            #Donne le nombre de tours en fonction du temps
+            #----------------------------------------------------
+            if rotVar.get() == 1:
+                #print('rot')
+                graphToShow = True
+                plt.figure(3)
+                plt.suptitle('Evolution of number of rotations\n x = red, y = blue, z = green')
+                plt.xlabel('Time')
+                plt.ylabel('Rotations')
                 colors = ['r', 'b', 'g']
                 for idx, x in enumerate([gyroXIdx, gyroYIdx, gyroZIdx]):
-                    plt.plot(timeValues, organized[x], colors[idx])
+                    rotationValues = []
+                    rotations = 0
+                    for i in range(len(gyro[xa])):
+                        rotationValues.append(rotations)
+                        if i != len(gyro[xa]) - 1:
+                            rotations += (gyro[xa][i] * (timeValues[i + 1] - timeValues[i]))/2*pi
+                    plt.plot(timeValues, rotationValues, color = colors[idx])
+            #----------------------------------------------------
+            #Donne la vitesse et ou la distance en fonction du temps
+            #----------------------------------------------------
+            if speedVar.get() == 1 or distVar.get() == 1:
+                graphToShow = True
+                speed = [[],[],[]]
+                for idx, i in enumerate(acc):
+                    speedVal = 0
+                    for j in range(len(i) - 1):
+                        speedVal += (i[j] - 1)*(timeValues[j + 1] - timeValues[j])
+                        speed[idx].append(speedVal)
+                speedTimeValues = copy.copy(timeValues)
+                speedTimeValues.pop(-1)
+                if speedVar.get() == 1:
+                    #print('speed')
+                    plt.figure(4)
+                    plt.suptitle('Evolution of Speed\n x = red, y = green, z = blue')
+                    plt.xlabel('Time')
+                    plt.ylabel('m/s')
+                    colors = ['r', 'g', 'b']
+                    for i in range(3):
+                        plt.plot(speedTimeValues, speed[i], color = colors[i])
+                    #print(len(speedTimeValues), len(speed[0]))
+                if distVar.get() == 1:
+                    #print('distance')
+                    distance = [[],[],[]]
+                    for xyz in range(3):
+                        distVal = 0
+                        for i in range(len(speed[xyz]) - 1):
+                            distVal += speed[xyz][i]*(speedTimeValues[i + 1] - speedTimeValues[i])
+                            distance[xyz].append(distVal)
+                    plt.figure(5)
+                    plt.suptitle('Evolution of Distance\n x = red, y = green, z = blue')
+                    plt.xlabel('Time')
+                    plt.ylabel('m')
+                    colors = ['r', 'g', 'b']
+                    distanceTimeValues = copy.copy(speedTimeValues)
+                    distanceTimeValues.pop(-1)
+                    #print(len(distanceTimeValues))
+                    #print(len(distance[0]))
+                    for i in range(3):
+                        plt.plot(distanceTimeValues, distance[i], color = colors[i])
+
+            #Donne les valeurs de magnetique brutes
+
+
+
+            if magVar.get() == 1:
+                #print('mag')
+                graphToShow = True
+                plt.figure(6)
+                plt.suptitle('Evolution of magnetic\n x = red, y = green, z = blue')
+                plt.xlabel('Time')
+                plt.ylabel('μt/s')
+                colors = ['r', 'g', 'b']
+                for idx, i in enumerate([MagXIdx, MagYIdx, MagZIdx]):
+                    magnetic = []
+                    for j in range(len(organized[i])):
+                        magnetic.append(organized[i][j])
+                    plt.plot(timeValues, magnetic, color = colors[idx])
+
             if graphToShow == True:
                 plt.show()
-        
+
 
 interface.bind('<Return>', getContents)
 
@@ -202,15 +453,14 @@ interface.mainloop()
 '''
 To do
 Graphics
- - acceleration evolution (all, x, y, z)
- - speed evolution (all, x, y, z)
- - gyro evolution (all, x, y, z)
- - distance evolution (all, x, y, z)
+Done    - Acceration
+        - speed evolution (all, x, y, z)
+Done    - gyro evolution (all, x, y, z)
+        - distance evolution (all, x, y, z)
 File with all data on the flight: (find beginning / end flight)
  - rotations
  - start rotation speed
  - start speed
- - start height
  - start height
  - distance
  - wobble amount
