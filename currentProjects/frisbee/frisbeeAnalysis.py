@@ -194,6 +194,18 @@ def wasneg(n):
         return True
     else:
         return False
+    
+def limitPassed(data, value, sign): #data is the list to analyse, value is the limit to pass, sign is either '+' or '-' and indicates if the limit has to be passed from above or below
+    idxLimitFound = None
+    for obj in data:
+        if idxLimitFound == None:
+            if sign == '+':
+                if obj >= value:
+                    idxLimitFound = obj
+            elif sign == '-':
+                if obj <= value:
+                    idxLimitFound = obj
+    return(idxLimitFound)
 
 def getContents(event):
     g = 9.81

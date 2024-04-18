@@ -1,0 +1,16 @@
+from math import *
+def depasser(a):
+    m = 1
+    while (exp(m) / m) < a:
+        #print(exp(m) / m)
+        m += 1
+    #print(exp(m) / m)
+    if exp(m)/m == a:
+        print(2)
+    return(m)
+
+print(depasser(1))
+#print(depasser(100), 100)
+#print(depasser(1000), 1000)
+
+#print(exp(100) / 100)
