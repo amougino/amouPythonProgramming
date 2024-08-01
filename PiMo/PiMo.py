@@ -17,7 +17,7 @@ chars = [' ', '!', '“', '"', '#', '$', '%', '&', '‘', "'", '(', ')', '*', '+
          'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я', 'б', 'в', 'г', 'д', 'ж', 'з', 'и', 'й', 
          'к', 'л', 'м', 'н', 'п', 'т', 'у', 'ф', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 
          'ю', 'я', 'Δ', 'Θ', 'Λ', 'Ξ', 'Π', 'Σ', 'Φ', 'Ψ', 'Ω', 'α', 'β', 'γ', 'δ', 'ε', 
-         'ζ', 'η', 'θ', 'λ', 'μ', 'ν', 'ξ', 'π', 'ρ', 'ς', 'σ', 'φ', 'ψ', 'ω']
+         'ζ', 'η', 'θ', 'λ', 'μ', 'ν', 'ξ', 'π', 'ρ', 'ς', 'σ', 'φ', 'ψ', 'ω', '∈']
 
 colors = {
     'black':    (0,0,0),
@@ -68,30 +68,28 @@ class cursor:
         }
         '''
         #white : ignore
-        *green : add to stack (arg)
+        @green : condition (cell,comparator,cell)
         @blue : store (cell int, every int left in stack / every char left in stack -> not both)
         @magenta : goto (int,int)
-        @yellow : condition (cell,comparator,cell)
+        @yellow : turn (int)
         @cyan : remove from stack (number to remove)
         @d_red : get input (cell)
         @d_green : print (cell)
         @d_blue : ignore next cells (int)
-        %orange : cell/int value
-        %lime : str value (can be long? idk)
+        @%orange : add cell/int value to stack (if int on stack, can be used to add larger numbers / multiple numbers (idk yet))
+        @%lime : add str value to stack (if int on stack, can be used to add multiple chars. each pixel can hold up to 3 chars, no chars is 255 -> example : to add 11 do (19,19,255))
         @apple : duplicate (cell,cell)
         @azure : operation (add,sub,mult,div) (type(0,1,2,3,4...),cell1,cell2,cell3... if unused cell in stack -> it will be used to store result -> otherwise will use the first cell used)
         @%indigo : comparator (equal,greater,less,>=,<=... needs int)
-        @pink : turn (int)
+        &pink : free slot for func?
         &l_magenta : free slot for func?
         &l_yellow : free slot for func?
         &l_cyan : free slot for func?
 
-        #does nothing
-        *adds argument before to stack (int/char)
-        @function that accesses and uses args on stack
-        %is added to stack (placed before green)
-        @%uses arg(s) and then adds to stack
-        &user can add their own functions
+        #  does nothing
+        @  function that accesses and uses args on stack
+        @% ( (uses arg(s) and then ) adds to stack
+        &  user can add their own functions
         '''
 
     def cell_valid_movement(self,cell):
