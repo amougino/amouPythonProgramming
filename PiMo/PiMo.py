@@ -19,8 +19,31 @@ chars = [' ', '!', '“', '"', '#', '$', '%', '&', '‘', "'", '(', ')', '*', '+
          'ю', 'я', 'Δ', 'Θ', 'Λ', 'Ξ', 'Π', 'Σ', 'Φ', 'Ψ', 'Ω', 'α', 'β', 'γ', 'δ', 'ε', 
          'ζ', 'η', 'θ', 'λ', 'μ', 'ν', 'ξ', 'π', 'ρ', 'ς', 'σ', 'φ', 'ψ', 'ω']
 
-def getImage(filePath = ''):
-    file = os.path.expanduser(filePath)
+colors = {
+    'black':    (0,0,0),
+    'white':    (255,255,255),
+    'red':      (255,0,0),
+    'green':    (0,255,0),
+    'blue':     (0,0,255),
+    'magenta':  (255,0,255),
+    'yellow':   (255,255,0),
+    'cyan':     (0,255,255),
+    'd_red':    (128,0,0),
+    'd_green':  (0,128,0),
+    'd_blue':   (0,0,128),
+    'orange':   (255,128,0),
+    'lime':     (128,255,0),
+    'apple':    (0,255,128),
+    'azure':    (0,128,255),
+    'indigo':   (128,0,255),
+    'pink':     (255,0,128),
+    'l_magenta':(255,128,255),
+    'l_yellow': (255,255,128),
+    'l_cyan':   (128,255,255)
+}
+
+def get_image(file_path = ''):
+    file = os.path.expanduser(file_path)
     if file == '':
         raise(Exception('File not defined'))
     try:
@@ -29,22 +52,76 @@ def getImage(filePath = ''):
     except FileNotFoundError:
         raise(Exception('File does not exist'))
     
+
+
 class cursor:
 
-    def __init__(self, image, startingPosition = (0,0), direction = (1,0)):
+    def __init__(self, image, starting_pos = (0,0), direction = [1,0]):
         self.image = image
         self.imageSize = image.size
-        self.position = startingPosition
+        self.pos = starting_pos
         self.direction = direction
+        self.active = True
+        self.processes = {
+            (255,0,0):self.end_program
+        }
 
-    def checkForWalls(self):
-        pass
-    
+    def cell_valid_movement(self,cell):
+        valid = True
+        try:
+            if self.image.getpixel(cell) == colors['black']:
+                valid = False
+        except IndexError:
+            valid = False
+        for xy in range(2):
+            if cell[xy] < 0:
+                valid = False
+        return(valid)
+
+    def check_for_walls(self):
+        count = 0
+        while self.cell_valid_movement((
+            self.pos[0] + self.direction[0],
+            self.pos[1] + self.direction[1]
+            )) == False:
+            count += 1
+            if count >= 4:
+                raise Exception('ERROR : Cursor stuck in walls')
+            if self.direction[1] != 0:
+                self.direction[0] = self.direction[1]*(-1)
+                self.direction[1] = 0
+            else:
+                self.direction[1] = self.direction[0]
+                self.direction[0] = 0
+            
+    def end_program(self):
+        self.active = False
+
+    def evaluate_cell(self):
+        try:
+            self.processes[self.image.getpixel(self.pos)]
+        except KeyError:
+            print('ignored (to remove later)')
+
     def move(self):
-        pass
+        self.pos = (
+            self.pos[0] + self.direction[0],
+            self.pos[1] + self.direction[1]
+            )
 
-    def readCell(self):
+    def read_cell(self):
         pass
 
 if __name__ == '__main__':
-    cursor = cursor(getImage(os.getcwd()+'/PiMo/PiMoImage1.png'))
+    cursor = cursor(get_image(os.getcwd()+'/PiMo/PiMoImage2.png'))
+    moves = 0
+    print('startpos',cursor.pos)
+    while moves < 10:
+        cursor.evaluate_cell()
+        cursor.check_for_walls()
+        cursor.move()
+        print('pos',cursor.pos)
+        moves += 1
+        if cursor.active == False:
+            print('program ended')
+            break
