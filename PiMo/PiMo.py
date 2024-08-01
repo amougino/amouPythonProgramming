@@ -63,8 +63,36 @@ class cursor:
         self.direction = direction
         self.active = True
         self.processes = {
-            (255,0,0):self.end_program
+            colors['black']:self.error_in_wall,
+            colors['red']:self.end_program
         }
+        '''
+        #white : ignore
+        *green : add to stack (arg)
+        @blue : store (cell int, every int left in stack / every char left in stack -> not both)
+        @magenta : goto (int,int)
+        @yellow : condition (cell,comparator,cell)
+        @cyan : remove from stack (number to remove)
+        @d_red : get input (cell)
+        @d_green : print (cell)
+        @d_blue : ignore next cells (int)
+        %orange : cell/int value
+        %lime : str value (can be long? idk)
+        @apple : duplicate (cell,cell)
+        @azure : operation (add,sub,mult,div) (type(0,1,2,3,4...),cell1,cell2,cell3... if unused cell in stack -> it will be used to store result -> otherwise will use the first cell used)
+        @%indigo : comparator (equal,greater,less,>=,<=... needs int)
+        @pink : turn (int)
+        &l_magenta : free slot for func?
+        &l_yellow : free slot for func?
+        &l_cyan : free slot for func?
+
+        #does nothing
+        *adds argument before to stack (int/char)
+        @function that accesses and uses args on stack
+        %is added to stack (placed before green)
+        @%uses arg(s) and then adds to stack
+        &user can add their own functions
+        '''
 
     def cell_valid_movement(self,cell):
         valid = True
@@ -78,6 +106,14 @@ class cursor:
                 valid = False
         return(valid)
 
+    def turn_right(self):
+        if self.direction[1] != 0:
+            self.direction[0] = self.direction[1]*(-1)
+            self.direction[1] = 0
+        else:
+            self.direction[1] = self.direction[0]
+            self.direction[0] = 0
+
     def check_for_walls(self):
         count = 0
         while self.cell_valid_movement((
@@ -86,20 +122,18 @@ class cursor:
             )) == False:
             count += 1
             if count >= 4:
-                raise Exception('ERROR : Cursor stuck in walls')
-            if self.direction[1] != 0:
-                self.direction[0] = self.direction[1]*(-1)
-                self.direction[1] = 0
-            else:
-                self.direction[1] = self.direction[0]
-                self.direction[0] = 0
+                raise Exception('ERROR : Cursor surrounded by walls')
+            self.turn_right()
             
+    def error_in_wall(self):
+        raise Exception('ERROR : Cursor in wall')
+
     def end_program(self):
         self.active = False
 
     def evaluate_cell(self):
         try:
-            self.processes[self.image.getpixel(self.pos)]
+            self.processes[self.image.getpixel(self.pos)]()
         except KeyError:
             print('ignored (to remove later)')
 
@@ -113,15 +147,15 @@ class cursor:
         pass
 
 if __name__ == '__main__':
-    cursor = cursor(get_image(os.getcwd()+'/PiMo/PiMoImage2.png'))
+    cursor = cursor(get_image(os.getcwd()+'/PiMo/PiMoImage3.png'))
     moves = 0
     print('startpos',cursor.pos)
-    while moves < 10:
+    while moves < 100:
         cursor.evaluate_cell()
+        if cursor.active == False:
+            print('program ended')
+            break
         cursor.check_for_walls()
         cursor.move()
         print('pos',cursor.pos)
         moves += 1
-        if cursor.active == False:
-            print('program ended')
-            break
