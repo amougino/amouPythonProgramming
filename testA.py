@@ -1,9 +1,25 @@
-import time
+import operator
 
-starttime = time.time()
-for x in range(0,10):
-    a = 0
-    for i in range(1000000*x,1000000*(x+1)):
-        a += i/200000
-    print(a)
-print('That took {} seconds'.format(time.time() - starttime))
+comparators = ['==','!=','>','<','>=','<=']
+
+comparators_processes = {
+    '==':operator.eq,
+    '!=':operator.ne,
+    '>':operator.gt,
+    '<':operator.lt,
+    '>=':operator.ge,
+    '<=':operator.le
+}
+
+operations = ['+','-','*','/','%','//','**']
+
+operations_processes = {
+    '+':operator.add,
+    '-':operator.sub,
+    '*':operator.mul,
+    '/':operator.truediv,
+    '%':operator.mod,
+    '//':operator.floordiv,
+    '**':operator.pow
+}
+print(operator.is_(4,4))

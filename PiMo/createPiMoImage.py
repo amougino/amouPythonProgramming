@@ -9,10 +9,17 @@ def saveImage(imageToSave, path):
     file = os.path.expanduser(path)
     imageToSave.save(file)
 
-PiMoImage = createImg((10,10))
-blackPixels = [(3,0),(2,3),(1,1),(0,2),(5,2),(3,3),(4,4),(0,3),(3,7),(1,6),(2,5),(8,6),(7,8),(3,7),(6,5)]
-for pixel in blackPixels:
-    PiMoImage.putpixel(pixel,(0,0,0))
-PiMoImage.putpixel((5,8),(255,0,0))
+PiMoImage = createImg((100,100))
+orange_pixels = [(0,0),(7,0)]
+for pixel in orange_pixels:
+    PiMoImage.putpixel(pixel,(255,128,0))
+PiMoImage.putpixel((1,0),(255,255,222))
+PiMoImage.putpixel((8,0),(255,255,23))
+pink_pixels = [(2,0),(3,0),(4,0)]
+for pixel in pink_pixels:
+    PiMoImage.putpixel(pixel,(255,0,128))
+#PiMoImage.putpixel((5,0),(0,0,255))
+PiMoImage.putpixel((16,0),(0,255,128))
 
-saveImage(PiMoImage,os.getcwd()+'/PiMo/PiMoImage3.png')
+
+saveImage(PiMoImage,os.getcwd()+'/PiMo/PiMoImage7.png')
