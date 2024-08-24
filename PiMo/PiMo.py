@@ -2,7 +2,7 @@ import os
 import PIL.Image as img
 import operator
 
-#all possible characters for strings (here the first object has a value of 1 and the last a value of 254)
+#all possible characters for strings (here the first object has a value of 1 and the last a value of 254) ### CLEAN UP
 chars = [' ', '!', '“', '"', '#', '$', '%', '&', '‘', "'", '(', ')', '*', '+', ',', '-', 
          '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', ';', '<', '=', 
          '>', '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
@@ -43,20 +43,7 @@ colors = {
     'l_cyan':   (128,255,255)
 }
 
-comparators_processes = {
-    '==':operator.eq,
-    '!=':operator.ne,
-    '>':operator.gt,
-    '<':operator.lt,
-    '>=':operator.ge,
-    '<=':operator.le
-}
-
-comparators = []
-for comparator in comparators_processes:
-    comparators.append(comparator)
-
-operations_processes = {
+operations_processes = { ###CLEAN UP
     '+':operator.add,
     '-':operator.sub,
     '*':operator.mul,
@@ -66,9 +53,26 @@ operations_processes = {
     '**':operator.pow
 }
 
-operations = []
+comparators_processes_int = {
+    '>':operator.gt,
+    '<':operator.lt,
+    '>=':operator.ge,
+    '<=':operator.le
+}
+
+comparators_processes_all = {
+    '==':operator.eq,
+    '!=':operator.ne
+}
+
+operations_and_comparators = []
 for operation in operations_processes:
-    operations.append(operation)
+    operations_and_comparators.append(operation)
+for comparator in comparators_processes_int:
+    operations_and_comparators.append(comparator)
+for comparator in comparators_processes_all:
+    operations_and_comparators.append(comparator)
+
 
 def get_image(file_path = ''):
     file = os.path.expanduser(file_path)
@@ -90,45 +94,45 @@ class cursor:
 
         self.active = True
 
-        self.processes = {
+        self.processes = { ###
             colors['black']:self.error_in_wall,
             colors['red']:self.end_program,
             colors['blue']:self.store_in_cell,
             colors['magenta']:self.go_to,
             colors['yellow']:self.turn_right,
             colors['cyan']:self.remove_from_stack,
-            colors['d_red']:self.get_input,
-            colors['d_green']:self.print_cell,
+            #colors['d_red']:self.get_input,
+            colors['d_green']:self.print_or_input,
             colors['d_blue']:self.ignore_pixels,
             colors['orange']:self.int_to_stack,
             colors['lime']:self.str_to_stack,
             colors['apple']:self.copy_cell,
+            colors['azure']:self.oper_cond_to_stack,
+            colors['indigo']:self.oper_cond,
             colors['pink']:self.duplicate_stack_top
         }
         self.stack = []
         self.small_stack_str = ''
-        self.small_stack_oper = ''
-        self.small_stack_comp = ''
         self.expecting = ('all',0)
         self.movement = True
         self.cells = {}
-        '''
+        '''  ###
         + #white : ignore
         + #black : wall
         + #red : end program
-        @green : condition (cell,comparator,cell)
+            @green : add cell content to stack
         + @blue : store (cell int,value)
         + @magenta : goto (int,int)
         + @yellow : turn (int)
         + @cyan : remove from stack (amount to remove is int on top of stack and is not counted in the args removed)
-        + @d_red : get input (cell) -> how does it know if string or int??? -> maybe an int can start with a # ?
-        + @d_green : print (cell)                                                                                                                                                                                                                                                                                                                                 
+            @d_red : store full stack in cell
+        + @d_green : print (cell) but if cell empty then get input (get input (cell)
         + @d_blue : ignore next cells (int)
         + @%orange : add cell/int value to stack (if int on stack, can be used to add larger numbers / multiple numbers (idk yet))
         + @%lime : add str value to stack (if int on stack, can be used to add multiple chars. each pixel can hold up to 3 chars, no chars is 255 -> example : to add 11 do (19,19,255))
         + @apple : copy (cell,cell) doesnt do anything if cell to copy isnt filled
-        @azure : operation (add,sub,mult,div) (type(0,1,2,3,4...),cell1,cell2,cell3... if unused cell in stack -> it will be used to store result -> otherwise will use the first cell used)
-        - @%indigo : comparator (equal,greater,less,>=,<=... needs int)
+        + @azure : add oper or cond to stack
+        + @%indigo : operation or condition
         + @pink : duplicate top of stack
         &l_magenta : free slot for func?
         &l_yellow : free slot for func?
@@ -140,8 +144,9 @@ class cursor:
         &  user can add their own functions
 
         to do list
-         - azure
-         - indigo / green
+         - green
+         - dark_red
+         - add program break if not ending
         '''
 
     def cell_valid_movement(self,cell):
@@ -215,29 +220,23 @@ class cursor:
         else:
             print('nothing to remove (to remove later)') ###
 
-    def get_input(self):
+    def print_or_input(self):
         if len(self.stack) >= 1:
             if isinstance(self.stack[-1], int):
                 if self.stack[-1] > 0:
-                    input_value = input(f'INPUT - at cell {self.pos} - ')
-                    if input_value[0] == '#':
-                        self.cells[self.stack[-1]] = int(input_value[1:])
-                    else:
-                        self.cells[self.stack[-1]] = input_value
-                    self.stack.pop(-1)
-                else:
-                    raise Exception('ERROR : Cell key as input cannot be negative')
-            else:
-                raise Exception('ERROR : Argument not an integer, no cell indicated to input to')
-        else:
-            raise Exception('ERROR : Insufficient arguments to input')
-
-    def print_cell(self):
-        if len(self.stack) >= 1:
-            if isinstance(self.stack[-1], int):
-                if self.stack[-1] > 0:
-                    print('pimo >>>',self.cells[self.stack[-1]])
-                    self.stack.pop(-1)
+                    try:
+                        print('pimo >>>',self.cells[self.stack[-1]])
+                        self.stack.pop(-1)
+                    except KeyError:
+                        input_value = input(f'PIXEL {self.pos} - CELL {self.stack[-1]} - ')
+                        if len(input_value) > 1:
+                            if input_value[0] == '#':
+                                self.cells[self.stack[-1]] = int(input_value[1:])
+                            else:
+                                self.cells[self.stack[-1]] = input_value
+                        else:
+                            self.cells[self.stack[-1]] = input_value
+                        self.stack.pop(-1)
                 else:
                     raise Exception('ERROR : Cell key to print cannot be negative')
             else:
@@ -258,7 +257,7 @@ class cursor:
         else:
             self.expecting = ('pass',1)
 
-    def int_to_stack(self):
+    def int_to_stack(self): ###
         '''if len(self.stack) >= 1:
             if isinstance(self.stack[-1], int):
                 if self.stack[-1] > 0:
@@ -304,9 +303,51 @@ class cursor:
         else:
             raise Exception('ERROR : Insufficient arguments to copy')
         
-    def operation_to_stack(self):
-        self.expecting = ('oper',1)
-
+    def oper_cond_to_stack(self):
+        self.expecting = ('oper/cond',1)
+        
+    def oper_cond(self):
+        if len(self.stack) >= 3:
+            if self.stack[-1] in comparators_processes_all:
+                condition_bool = comparators_processes_all[self.stack[-1]](
+                    self.stack[-3],
+                    self.stack[-2]
+                )
+                if condition_bool:
+                    self.turn_right()
+                self.stack = self.stack[:-3]
+            else:
+                if isinstance(self.stack[-3], int):
+                    if isinstance(self.stack[-2], int):
+                        if self.stack[-1] in comparators_processes_int:
+                            condition_bool = comparators_processes_int[self.stack[-1]](
+                                self.stack[-3],
+                                self.stack[-2]
+                            )
+                            if condition_bool:
+                                self.turn_right()
+                            self.stack = self.stack[:-3]
+                        elif self.stack[-1] in operations_processes:
+                            if self.stack[-3] > 0:
+                                if self.stack[-2] > 0:
+                                    self.cells[self.stack[-3]] = operations_processes[self.stack[-1]](
+                                        self.cells[self.stack[-3]],
+                                        self.cells[self.stack[-2]]
+                                        )
+                                    self.stack = self.stack[:-3]
+                                else:
+                                    raise Exception('ERROR : []')#to fill in ###
+                            else:
+                                raise Exception('ERROR : []')
+                        else:
+                            raise Exception('ERROR : []')
+                    else:
+                        raise Exception('ERROR : []')
+                else:
+                    raise Exception('ERROR : []')
+        else:
+            raise Exception('ERROR : []')
+                            
     def duplicate_stack_top(self):
         if len(self.stack) > 0:
             self.stack.append(self.stack[-1])
@@ -325,9 +366,9 @@ class cursor:
             current_pixel = self.image.getpixel(self.pos)
             if current_pixel != colors['white']:
                 self.stack.append(
-                    (255 - current_pixel[2]) +
-                    (255 - current_pixel[1]) * 256 +
-                    (255 - current_pixel[0]) * (256**2)
+                    current_pixel[2] +
+                    current_pixel[1] * 256 +
+                    current_pixel[0] * (256**2)
                     )
                 self.expecting = ('int',self.expecting[1] - 1)
                 if self.expecting[1] <= 0:
@@ -352,18 +393,13 @@ class cursor:
                 if self.expecting[1] <= 0:
                     self.expecting = ('all',0)
 
-        elif self.expecting[0] == 'oper':
+        elif self.expecting[0] == 'oper/cond':
             current_pixel = self.image.getpixel(self.pos)
             if current_pixel != colors['white']:
-                for value in current_pixel:
-                    if value != 255:
-                        self.small_stack_oper += operations[value%len(operations)]
-                self.expecting = ('oper',self.expecting[1] - 1)
-                if self.expecting[1] <= 0:
-                    self.expecting = ('all',0)
-
-    def operate(self):
-        pass
+                self.stack.append(operations_and_comparators[
+                    current_pixel[2] % len(operations_and_comparators)
+                    ])
+                self.expecting = ('all',0)
 
     def move(self):
         if self.movement:
@@ -374,17 +410,22 @@ class cursor:
         else:
             self.movement = True
 
+
+
+
+
+
+
 if __name__ == '__main__':
-    cursor = cursor(get_image(os.getcwd()+'/PiMo/PiMoImage7.png'))
-    moves = 0 ###
-    #print('startpos',cursor.pos) ###
-    while moves < 40:
+    cursor = cursor(get_image(os.getcwd()+'/PiMo/PiMoImage8.png'))
+    #moves = 0 ###
+    print('startpos',cursor.pos) ###
+    #while moves < 40:
+    while cursor.active:
         cursor.evaluate_cell()
-        if cursor.active == False:
-            print('end program',cursor.stack)
-            break
-        cursor.check_for_walls()
-        cursor.move()
+        #if cursor.active == False:
+        #    print('end program',cursor.stack)
+        #    break
         print(
             'pos',cursor.pos,
             'stack',cursor.stack,
@@ -392,4 +433,6 @@ if __name__ == '__main__':
             'cells',cursor.cells,
             'color',cursor.image.getpixel(cursor.pos)
             ) ###
-        moves += 1
+        cursor.check_for_walls()
+        cursor.move()
+        #moves += 1 ###
