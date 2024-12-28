@@ -139,5 +139,5 @@ class num:
         
 a = num(0.0123456)
 b = num(0.0123456)
-a.operation('sub', b)
+a.operation('add', b)
 a.printVal()
