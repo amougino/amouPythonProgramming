@@ -1,16 +1,16 @@
 # rotation
 import os
 
-def open_file():
+def open_file(): ## to do
     pass
 
-def analyse_file():
+def analyse_file(): ## to do
     pass
 
-def file_to_vel_pos():
+def file_to_vel_pos(): ## to do
     pass
 
-class Num:
+class Num: ## to do 4 (decide what to do with this?? maybe save in another file for another time) -> good for continuing after the '.' for a bit, but nothing else...
 
     def __init__(self,value,power,precision):
         self.val = value
@@ -95,7 +95,17 @@ class MagNum:
             self.val.insert(0, self.val[0] // 10)
             self.val[1] %= 10
             
-    def __add__(self,other):
+    def is_greater(self,other): ## to do 1
+        pass
+
+    def __add__(self,other): ## to do 2
+        if self.sign == other.sign:
+            return(self.add(other))
+        else:
+            if self.is_greater:
+                pass
+
+    def add(self,other):
         if other.pow > self.pow:
             other.val += [0 for i in range(other.pow - self.pow)]
         else:
@@ -111,12 +121,22 @@ class MagNum:
             self.val[i] += other.val[i]
         self.flatten()
         return(self)
+    
+    def __sub__(self,other): ## to do 3
+        return(self + other)
+    
+    def __str__(self):
+        str_val = ''.join(str(i) for i in self.val)
+        if self.pow < 0:
+            return(str_val[:len(self.val) + self.pow ] + '.' + str_val[len(self.val) + self.pow:])
+        else:
+            return(str_val + '0'*self.pow)
 
-class Vector:
+class Vector: ## to do
     pass
 
-class Body:
+class Body: ## to do
     pass
 
-class System:
+class System: ## to do
     pass
