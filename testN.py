@@ -1,2 +1,4 @@
-for i in range(1,10):
-    print('0'*i)
+
+a = (3 + 5)
+b = (3,4)
+print(a,b)

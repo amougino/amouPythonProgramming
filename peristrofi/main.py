@@ -8,7 +8,9 @@ settings = [
 ]
 
 if __name__ == '__main__':
-    a = MagNum(1000)
-    b = MagNum(1000)
-    a -= b
-    print(a)
+    vala = 10.0000015
+    valb = 3.1414
+    a = MagNum(vala,-6)
+    b = MagNum(valb,-6)
+    c = a + b
+    print(a,b,c,vala + valb)
