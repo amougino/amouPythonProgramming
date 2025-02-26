@@ -4,7 +4,7 @@ from gravSim2 import *
 
 from fuse import *
 
-precision = 2052
+precision = 30
 startPos = 25
 maxDistance = 3000
 divider = 12

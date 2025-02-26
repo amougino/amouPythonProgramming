@@ -64,7 +64,7 @@ class MagNum:
         if len(custom_val_pow_sign) != 3:
             if float_val < 0:
                 self.sign = -1
-                float_val = -float_val
+                float_val *= -1
             else:
                 self.sign = 1
             split_float = str(float_val).split('.')
@@ -73,8 +73,7 @@ class MagNum:
                 self.pow = -len(split_float[1])
             else:
                 self.pow = 0
-                print(split_float)
-                while split_float[0][-1] == '0':
+                while split_float[0][-1] == '0' and len(split_float[0]) > 1:
                     self.pow += 1
                     split_float[0] = split_float[0][:-1]
                 self.val = [int(char) for char in split_float[0]]
@@ -84,6 +83,8 @@ class MagNum:
             self.sign = custom_val_pow_sign[2]
         self.prec = precision
         self.change_prec_round(precision)
+        self.flatten_horizontal()
+        print(self.val,self.pow)
 
     def change_prec_round(self,new_prec):
         if new_prec > self.pow:
@@ -112,6 +113,14 @@ class MagNum:
         while self.val[0] // 10 != 0:
             self.val.insert(0, self.val[0] // 10)
             self.val[1] %= 10
+
+    def flatten_horizontal(self):
+        if self.val != [0]:
+            while self.val[-1] == 0:
+                self.val.pop(-1)
+                self.pow += 1
+            while self.val[0] == 0:
+                self.val.pop(0)
             
     def abs_greater(self,other):
         if (self.val,self.pow) == (other.val,other.pow):
@@ -136,7 +145,6 @@ class MagNum:
             return(self.add(other))
         else:
             if self.abs_greater(other):
-                print('sit1')
                 return(self.sub(other)) #sign = self.sign
             else:
                 if (self.val,self.pow) == (other.val,other.pow):
@@ -145,7 +153,6 @@ class MagNum:
                         custom_val_pow_sign = ([0],0,1)
                     ))
                 else:
-                    print('sit2')
                     return((other.sub(self))) #sign = other.sign
             
     def __sub__(self,other):
@@ -173,24 +180,42 @@ class MagNum:
         new_val = []
         for i in range(len(new_self_val)):
             new_val.append(new_self_val[i] + new_other_val[i])
-        print(new_val)
         new_num = MagNum(precision = max(self.prec,other.prec),
                          custom_val_pow_sign = (new_val,new_pow,self.sign))
         new_num.flatten()
         return(new_num)
     
     def sub(self,other): ## to do 3
-        print(self,other,'toto')
-        return(1)
+        if other.pow > self.pow:
+            new_other_val = other.val + [0 for i in range(other.pow - self.pow)]
+            new_self_val = self.val
+            new_pow = self.pow
+        else:
+            new_self_val = self.val + [0 for i in range(self.pow - other.pow)]
+            new_other_val = other.val
+            new_pow = other.pow
+        new_other_val = [0 for i in range(len(new_self_val) - len(new_other_val))] + new_other_val
+        new_val = []
+        for i in range(len(new_self_val)):
+            new_val.append(new_self_val[i] - new_other_val[i])
+        new_num = MagNum(precision = max(self.prec,other.prec),
+                         custom_val_pow_sign = (new_val,new_pow,self.sign))
+        new_num.flatten()
+        new_num.flatten_horizontal()
+        return(new_num)
     
     def __str__(self):
         str_val = ''.join(str(i) for i in self.val)
         if self.pow < 0:
-            return(str_val[:len(self.val) + self.pow ] + 
-                   '.' + 
-                   str_val[len(self.val) + self.pow:])
+            str_val = (str_val[:len(self.val) + self.pow] + 
+            '.' + 
+            str_val[len(self.val) + self.pow:])
         else:
-            return(str_val + '0'*self.pow)
+            str_val = (str_val + '0'*self.pow)
+        if self.sign == 1:
+            return(str_val)
+        else:
+            return('-'+str_val)
 
 class Vector: ## to do
     pass

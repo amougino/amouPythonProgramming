@@ -1,4 +1,5 @@
 from peristrofi_lib import *
+import random
 
 settings = [
     {
@@ -8,9 +9,6 @@ settings = [
 ]
 
 if __name__ == '__main__':
-    vala = 10.0000015
-    valb = 3.1414
-    a = MagNum(vala,-6)
-    b = MagNum(valb,-6)
-    c = a + b
-    print(a,b,c,vala + valb)
+    a = MagNum(1)
+    a -= MagNum(2)
+    print(a)
