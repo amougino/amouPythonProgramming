@@ -84,7 +84,7 @@ class MagNum:
         self.prec = precision
         self.change_prec_round(precision)
         self.flatten_horizontal()
-        print(self.val,self.pow)
+        #print(self.val,self.pow)
 
     def change_prec_round(self,new_prec):
         if new_prec > self.pow:
@@ -140,8 +140,8 @@ class MagNum:
                         idx += 1
                 return(len(self.val) > len(other.val))
 
-    def __add__(self,other):
-        if self.sign == other.sign:
+    def __add__(self,other,sign_diff = 1):
+        if self.sign == other.sign * sign_diff:
             return(self.add(other))
         else:
             if self.abs_greater(other):
@@ -153,14 +153,10 @@ class MagNum:
                         custom_val_pow_sign = ([0],0,1)
                     ))
                 else:
-                    return((other.sub(self))) #sign = other.sign
+                    return((other.sub(self,sign_diff = -1))) #sign = other.sign
             
     def __sub__(self,other):
-        inverse_val_pow_sign = (other.val,other.pow,other.sign * -1)
-        inverse_other = MagNum(
-            precision = other.prec,
-            custom_val_pow_sign = inverse_val_pow_sign)
-        return(self.__add__(inverse_other))
+        return(self.__add__(other,sign_diff = -1))
 
     def add(self,other):
         if other.pow > self.pow:
@@ -185,7 +181,7 @@ class MagNum:
         new_num.flatten()
         return(new_num)
     
-    def sub(self,other): ## to do 3
+    def sub(self,other,sign_diff = 1): ## to do 3
         if other.pow > self.pow:
             new_other_val = other.val + [0 for i in range(other.pow - self.pow)]
             new_self_val = self.val
@@ -199,7 +195,7 @@ class MagNum:
         for i in range(len(new_self_val)):
             new_val.append(new_self_val[i] - new_other_val[i])
         new_num = MagNum(precision = max(self.prec,other.prec),
-                         custom_val_pow_sign = (new_val,new_pow,self.sign))
+                         custom_val_pow_sign = (new_val,new_pow,self.sign * sign_diff))
         new_num.flatten()
         new_num.flatten_horizontal()
         return(new_num)

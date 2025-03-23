@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+'''
 # Nombre de valeurs simulees
 n = 1000000
 # Parametres
@@ -21,3 +22,10 @@ plt.axvline(x=np.mean(n_ester)-np.sqrt(2)*c*0.05, color = 'red', label = 'Interv
 plt.axvline(x=np.mean(n_ester)+np.sqrt(2)*c*0.05, color = 'red', label = 'Intervalle de confiance')
 plt.legend() 
 plt.show()
+'''
+
+import datetime
+
+x = datetime.datetime.now()
+
+print(x.strftime('%d_%m_%y'))
