@@ -39,15 +39,15 @@ def create_letter(format,parts):
         lines = f.readlines()
         all_sections = [section.split('\n')[0].split('---') for section in lines]
         letter = ''
-        for section in all_sections:
-            if section[0] in parts['sections']:
-                section_to_add = section[1]
-                for replacement in format_replacements + parts['replacements']:
-                    section_to_add = section_to_add.replace(replacement[0],replacement[1])
-                letter += section_to_add
-        '''
         for section in parts['sections']:
-            for '''
+            print(section)
+            for section2 in all_sections:
+                if section == section2[0]:
+                    print(section2[0])
+                    section_to_add = section2[1]
+                    for replacement in format_replacements + parts['replacements']:
+                        section_to_add = section_to_add.replace(replacement[0],replacement[1])
+                    letter += section_to_add
         return(letter)
 
 def save(text,parts):
@@ -63,7 +63,8 @@ def wordcount(text,parts):
     if length > 1500:
         print('!!! WORDCOUNT TO HIGH !!! ' + parts['save_name'] + ' !!! ' + str(length) + ' characters !!!')
 
-for prepa in prepas:
-    letter = create_letter('prepa',prepa)
-    wordcount(letter,prepa)
-    save(letter,prepa)
+if __name__ == '__main__':
+    for prepa in prepas:
+        letter = create_letter('prepa',prepa)
+        wordcount(letter,prepa)
+        save(letter,prepa)
