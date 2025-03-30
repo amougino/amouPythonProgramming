@@ -1,0 +1,7 @@
+P1---Madame, Monsieur,
+P2---[RRI]Je souhaiterais rejoindre [licence] de [universite] l’année prochaine.
+P3---[RRI]Après avoir vécu neuf ans aux États-Unis, j’ai intégré le collège puis le lycée International Europole de Grenoble. Cela m'a permis de continuer de pratiquer l'anglais à un niveau bilingue et d'obtenir le Baccalauréat Français International (BFI) tout en développant mes qualités de travail.
+P4---[RRI]Malgré des horaires plus conséquents que dans un autre lycée, pendant mon temps libre, je programme régulièrement en Python (depuis plus de 5 ans), photographie le ciel avec mon télescope et pratique la natation.
+P5---[RRI]Je souhaiterais poursuivre mes études dans l’espoir de faire des maths, de la physique et de l'informatique mon métier. Je suis convaincu que ce parcours me permettrait de progresser dans les domaines qui m'intéressent.
+P6---[RRI]Grâce à mon investissement au lycée, j’ai pu obtenir d’excellents résultats en maths et en physique. De plus, j’ai participé à de nombreux concours : Olympiades de Mathématiques de 4ème (1ère place de l’Académie de Grenoble en 2021), Coupes Animaths (mentions honorables ou très honorables), Olympiades de Physique (2023) et Concours Général de Mathématiques (2025). Ces concours m'entrainent sur des problèmes plus complexes et reflètent mon esprit de compétition.
+P7---[RRI]Je vous remercie de l’attention que vous porterez à ma candidature.
