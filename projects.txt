@@ -1,0 +1,7 @@
+current projects :
+ - magnum
+    - peristrofi
+       - search for stable 3 body systems (zoom)
+
+potential projects :
+ - https://www.youtube.com/watch?v=dtjb2OhEQcU
